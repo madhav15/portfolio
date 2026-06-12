@@ -112,7 +112,7 @@ window.addEventListener('scroll', () => {
             link.classList.add('active');
         }
     });
-});
+}, { passive: true });
 
 // Add active link styling
 const activeStyle = document.createElement('style');
@@ -127,38 +127,30 @@ activeStyle.textContent = `
 `;
 document.head.appendChild(activeStyle);
 
-// Enhanced parallax and floating animations
+// Optimized scroll animations (disabled on mobile for performance)
+const isMobile = window.innerWidth <= 768;
+
 window.addEventListener('scroll', () => {
+    if (isMobile) return;
+
     const hero = document.querySelector('.hero');
     if (hero) {
         const scrollPosition = window.scrollY;
 
-        // Parallax for hero background
+        // Parallax for hero background (desktop only)
         if (scrollPosition < window.innerHeight) {
-            const parallaxElements = hero.querySelectorAll('.hero::before, .hero::after');
             const moveY = scrollPosition * 0.5;
             hero.style.backgroundPosition = `0px ${moveY}px`;
         }
 
-        // Fade hero content on scroll
+        // Fade hero content on scroll (desktop only)
         const heroContent = document.querySelector('.hero-content');
         if (heroContent) {
             const opacity = Math.max(0, 1 - scrollPosition / 400);
             heroContent.style.opacity = opacity;
         }
     }
-
-    // Animate elements on scroll direction
-    document.querySelectorAll('.expertise-card, .project-card').forEach((el, index) => {
-        const rect = el.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-
-        if (isVisible) {
-            const offset = (rect.top / window.innerHeight) * 5;
-            el.style.transform = `translateY(${Math.min(0, offset * 20)}px)`;
-        }
-    });
-});
+}, { passive: true });
 
 // Number counter animation for stats
 function animateCounters() {
@@ -208,32 +200,46 @@ document.querySelectorAll('.project-link').forEach(link => {
     });
 });
 
+// Fix viewport height for mobile browsers (address bar height changes)
+if (isMobile) {
+    const fixMobileViewportHeight = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    fixMobileViewportHeight();
+    window.addEventListener('resize', fixMobileViewportHeight, { passive: true });
+    window.addEventListener('orientationchange', fixMobileViewportHeight, { passive: true });
+}
+
 // Scroll to top on page load
 window.scrollTo(0, 0);
 
-// Mouse follow effect for expertise cards
-document.addEventListener('mousemove', (e) => {
-    const cards = document.querySelectorAll('.expertise-card');
-    cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+// Mouse follow effect for expertise cards (desktop only)
+if (!isMobile) {
+    document.addEventListener('mousemove', (e) => {
+        const cards = document.querySelectorAll('.expertise-card');
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
 
-        const rotateX = (y - centerY) / 10;
-        const rotateY = (centerX - x) / 10;
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
 
-        if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
-            card.style.transition = 'none';
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        } else {
-            card.style.transition = 'all 0.3s ease';
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        }
+            if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
+                card.style.transition = 'none';
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            } else {
+                card.style.transition = 'all 0.3s ease';
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            }
+        });
     });
-});
+}
 
 // Enhanced button hover effects
 document.querySelectorAll('.btn').forEach(btn => {
