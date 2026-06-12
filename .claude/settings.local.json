@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(html|css|js|md|txt\\)$\")",
+      "Bash(chromium-cli screenshot *)",
+      "Bash(curl -s http://localhost:8000)",
+      "Bash(pkill -f \"python3 -m http.server\")",
+      "Bash(python3 -m http.server 8000)",
+      "Bash(curl -s http://localhost:8000/styles.css)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(python3 *)",
+      "Bash(bash /tmp/quick_test.sh)"
+    ]
+  }
+}
